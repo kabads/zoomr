@@ -21,7 +21,7 @@ def main():
     DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 20)
     pygame.display.set_caption('Zoomr')
-
+    DISPLAYSURF.fill(BLACK)
 
     while True:
         runGame()
@@ -32,7 +32,8 @@ def runGame():
     starty = random.randint(0,480)
     print ("x is " + str(startx) + " y is " + str(starty))
     drawbot(startx, starty)
-    pygame.display.update()
+    #player = Protagonist(
+    
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -40,17 +41,57 @@ def runGame():
             elif event.type == KEYDOWN:
                 if event.key== K_ESCAPE:
                     terminate()
+                elif event.key ==K_a:
+                    startx-=10
+                    drawbot(startx, starty)
+                elif event.key==K_d:
+                    startx+=10
+                    drawbot(startx, startx)
+                elif event.key==K_w:
+                    starty-=10
+                    drawbot(startx, starty)
+                elif event.key==K_s:
+                    starty+=10
+                    drawbot(startx, starty)
+        DISPLAYSURF.fill(BLACK)
+        drawbot(startx, starty)
+        pygame.display.update()
+        
+def moveLeft(x,y):
+    x = x-1 
+    drawbot(x,y)
 
 def drawbot(x,y):
-    print "now running drawbot"
     botRect = pygame.Rect(x,y, 10,10)
     pygame.draw.rect(DISPLAYSURF, WHITE, botRect)
+    #DISPLAYSURF.blit(DISPLAYSURF, botRect)
     print "I have drawn a square at " + str(x) + ", " + str(y)
+    #return(x,y)
+
+
 
 def terminate():
     pygame.quit()
     sys.exit()
 
+
+#class Protaganist(pygame.sprite.Sprite):
+#        def __init__(self, x, y):
+#            pygame.init()
+#            pygame.sprite.Sprite.__init__(self)
+#            # Basic variables
+#            self.speed = [2,2]
+
+            # Sets up the image and Rect
+#        self.bitmap.set_colorkey((0,0,0))
+#        self.shipRect = self.bitmap.get_rect()
+#        self.shipRect.topleft = [x,y]
+
+#        def move(self, x, y):
+#            self.shipRect.center = (x,y)
+
+#def render(self):
+#    screen.blit(self.bitmap, (self.shipRect))
 
 if __name__ == '__main__':
     main()

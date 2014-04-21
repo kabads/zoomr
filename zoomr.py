@@ -3,7 +3,6 @@
 # (c) 2014 A Cripps
 # See README and LICENSE for more information 
 
-<<<<<<< HEAD
 import pygame, random, sys
 from pygame.locals import * 
 
@@ -28,11 +27,21 @@ def main():
         runGame()
 
 def runGame():
+    # start at a random point
+    startx = random.randint(0,480)
+    starty = random.randint(0,680)
+    print ("x is " + str(startx) + " y is " + str(starty))
+    drawbot(startx, starty)
+    pygame.display.update()
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
                 terminate
 
+def drawbot(x,y):
+    print "now running drawbot"
+    botRect = pygame.Rect(x,y, 10,10)
+    pygame.draw.rect(DISPLAYSURF, WHITE, botRect)
 
 def terminate():
     pygame.quit()
@@ -41,7 +50,4 @@ def terminate():
 
 if __name__ == '__main__':
     main()
-=======
-import pygame, random
 
->>>>>>> c1b6410e8617538c4c125741d07e00e426d31990

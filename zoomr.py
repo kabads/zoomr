@@ -3,6 +3,7 @@
 # (c) 2014 A Cripps
 # See README and LICENSE for more information 
 
+<<<<<<< HEAD
 import pygame, random, sys
 from pygame.locals import * 
 
@@ -40,3 +41,7 @@ def terminate():
 
 if __name__ == '__main__':
     main()
+=======
+import pygame, random
+
+>>>>>>> c1b6410e8617538c4c125741d07e00e426d31990

@@ -13,6 +13,7 @@ WINHEIGHT = 480
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 RED = (255, 0, 0)
+GREEN = (50,155,0)
 
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT
@@ -52,16 +53,42 @@ def runGame():
             elif event.type ==KEYUP: 
                 break
                 
-        DISPLAYSURF.fill(BLACK)
+        DISPLAYSURF.fill(GREEN)
         drawPlayer(playerStartx, playerStarty)
+        botStartx, botStarty = moveBot(botStartx, botStarty)
+        botStartx, botStarty = checkBounds(botStartx, botStarty)
         drawBot(botStartx, botStarty)
         pygame.display.update()
+
+def checkBounds(x,y):
+    if x > 680:
+        x = 680
+    if y > 480:
+        y = 480
+    if x <= 0:
+        x = 0
+    if y <= 0: 
+        y = 0
+    return(x,y)
+
+def moveBot(x,y):
+    direction = random.randint(0,3)
+    if direction ==0:
+        x-=1
+        return(x,y)
+    elif direction ==1: 
+        x+=1 
+        return(x,y)
+    elif direction ==2:
+        y-=1
+        return(x,y)
+    elif direction ==3:
+        y+=1 
+        return(x,y)
         
 def getRandomCoords():
     x = random.randint(0,680)
-    print "x is " + str(x)
     y = random.randint(0,480)
-    print "y is " + str(y)
     return x, y
 
 def drawPlayer(x,y):
@@ -70,7 +97,7 @@ def drawPlayer(x,y):
 
 
 def drawBot(x,y):
-    botRect = pygame.Rect(200,200,10,10)
+    botRect = pygame.Rect(x,y,10,10)
     pygame.draw.rect(DISPLAYSURF, RED, botRect)
 
 def terminate():

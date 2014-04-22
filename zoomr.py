@@ -28,11 +28,11 @@ def main():
 
 def runGame():
     # start at a random point
-    startx = random.randint(0,680)
-    starty = random.randint(0,480)
-    print ("x is " + str(startx) + " y is " + str(starty))
-    drawbot(startx, starty)
-    #player = Protagonist(
+    playerStartx, playerStarty = getRandomCoords()
+    drawPlayer(playerStartx, playerStarty)
+    # start the bot at a random point
+    botStartx, botStarty = getRandomCoords()
+    drawBot(botStartx, botStarty)
     
     while True:
         for event in pygame.event.get():
@@ -42,56 +42,41 @@ def runGame():
                 if event.key== K_ESCAPE:
                     terminate()
                 elif event.key ==K_a:
-                    startx-=10
-                    drawbot(startx, starty)
+                    playerStartx-=10
                 elif event.key==K_d:
-                    startx+=10
-                    drawbot(startx, startx)
+                    playerStartx+=10
                 elif event.key==K_w:
-                    starty-=10
-                    drawbot(startx, starty)
+                    playerStarty-=10
                 elif event.key==K_s:
-                    starty+=10
-                    drawbot(startx, starty)
+                    playerStarty+=10
+            elif event.type ==KEYUP: 
+                break
+                
         DISPLAYSURF.fill(BLACK)
-        drawbot(startx, starty)
+        drawPlayer(playerStartx, playerStarty)
+        drawBot(botStartx, botStarty)
         pygame.display.update()
         
-def moveLeft(x,y):
-    x = x-1 
-    drawbot(x,y)
+def getRandomCoords():
+    x = random.randint(0,680)
+    print "x is " + str(x)
+    y = random.randint(0,480)
+    print "y is " + str(y)
+    return x, y
 
-def drawbot(x,y):
-    botRect = pygame.Rect(x,y, 10,10)
-    pygame.draw.rect(DISPLAYSURF, WHITE, botRect)
-    #DISPLAYSURF.blit(DISPLAYSURF, botRect)
-    print "I have drawn a square at " + str(x) + ", " + str(y)
-    #return(x,y)
+def drawPlayer(x,y):
+    playerRect = pygame.Rect(x,y,10,10)
+    pygame.draw.rect(DISPLAYSURF, WHITE, playerRect)
 
 
+def drawBot(x,y):
+    botRect = pygame.Rect(200,200,10,10)
+    pygame.draw.rect(DISPLAYSURF, RED, botRect)
 
 def terminate():
     pygame.quit()
     sys.exit()
 
-
-#class Protaganist(pygame.sprite.Sprite):
-#        def __init__(self, x, y):
-#            pygame.init()
-#            pygame.sprite.Sprite.__init__(self)
-#            # Basic variables
-#            self.speed = [2,2]
-
-            # Sets up the image and Rect
-#        self.bitmap.set_colorkey((0,0,0))
-#        self.shipRect = self.bitmap.get_rect()
-#        self.shipRect.topleft = [x,y]
-
-#        def move(self, x, y):
-#            self.shipRect.center = (x,y)
-
-#def render(self):
-#    screen.blit(self.bitmap, (self.shipRect))
 
 if __name__ == '__main__':
     main()

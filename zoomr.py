@@ -14,6 +14,22 @@ BLACK = (0,0,0)
 WHITE = (255,255,255)
 RED = (255, 0, 0)
 GREEN = (50,155,0)
+BLUE = (0,0,255)
+
+class Enemy:
+    def __init__(self, health, x, y):
+        #self.x = random.randint(0,680)
+        #self.y = random.randint(0,480)
+        self.x = x
+        self.y = y
+        self.health = 100
+        self.pos = pygame.Rect(x,y,10,10)
+        
+    def draw(self):
+        print "o.draw has been run!"
+        enemyRect = pygame.Rect(self.x, self.y, 10,10)
+        pygame.draw.rect(DISPLAYSURF, BLUE, enemyRect)
+        pygame.display.update()
 
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT
@@ -28,14 +44,30 @@ def main():
         runGame()
 
 def runGame():
+    DISPLAYSURF.fill(GREEN)
+
+    enemyObjects = []
+    for x in range (3):
+        x,y = getRandomCoords()
+        o = Enemy(100,x,y)
+        enemyObjects.append(o)
+        
+    for o in enemyObjects:
+        o.draw()
+        #pygame.display.update()
+
+
     # start at a random point
     playerStartx, playerStarty = getRandomCoords()
     drawPlayer(playerStartx, playerStarty)
     # start the bot at a random point
     botStartx, botStarty = getRandomCoords()
     drawBot(botStartx, botStarty)
-    
+
     while True:
+        #for o in enemyObjects:
+        #    o.draw()
+            #screen.blit(background, o.x, o.y)
         for event in pygame.event.get():
             if event.type == QUIT:
                 terminate
@@ -53,7 +85,6 @@ def runGame():
             elif event.type ==KEYUP: 
                 break
                 
-        DISPLAYSURF.fill(GREEN)
         drawPlayer(playerStartx, playerStarty)
         botStartx, botStarty = moveBot(botStartx, botStarty)
         botStartx, botStarty = checkBounds(botStartx, botStarty)

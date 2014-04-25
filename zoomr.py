@@ -90,7 +90,11 @@ def runGame():
         botStartx, botStarty = checkBounds(botStartx, botStarty)
         drawBot(botStartx, botStarty)
         pygame.display.update()
-
+        #DISPLAYSURF.fill(GREEN)
+        for o in enemyObjects:
+            o.draw()
+        
+        
 def checkBounds(x,y):
     if x > 680:
         x = 680

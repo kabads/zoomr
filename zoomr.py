@@ -57,6 +57,16 @@ class Enemy(pygame.sprite.Sprite):
         pygame.draw.rect(DISPLAYSURF, BLACK, enemyRect)
         #pygame.display.update()
 
+    def checkBounds(self):
+        if self.x >= 670:
+            self.x = 670
+        elif self.x <=0:
+            self.x = 0
+        if self.y >= 470:
+            self.y = 470
+        elif self.y<=0:
+            self.y=0
+
 #enemy_list = pygame.sprite.Group()
 enemy = Enemy(100,100,100) 
 def main():
@@ -113,13 +123,13 @@ def runGame():
             if event.key== K_ESCAPE:
                 terminate()
             if event.key ==K_a:
-               movex = -3 #playerStartx-=10
+               movex = -1 #playerStartx-=10
             if event.key==K_d:
-                movex = 3 #playerStartx+=10
+                movex = 1 #playerStartx+=10
             if event.key==K_w:
-                movey = -3 #playerStarty-=10
+                movey = -1 #playerStarty-=10
             if event.key==K_s:
-                movey = 3 #playerStarty+=10
+                movey = 1 #playerStarty+=10
             
             
         if (event.type==KEYUP):
@@ -135,6 +145,7 @@ def runGame():
     enemy.x += movex
     enemy.y += movey
     DISPLAYSURF.fill(GREEN)
+    enemy.checkBounds()
     enemy.draw()
     pygame.display.flip()
 

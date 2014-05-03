@@ -15,86 +15,145 @@ WHITE = (255,255,255)
 RED = (255, 0, 0)
 GREEN = (50,155,0)
 BLUE = (0,0,255)
+movex, movey=0,0
+all_sprite_list = pygame.sprite.Group()
 
-class Enemy:
+playerStartx = 0 
+playerStarty = 0
+
+
+
+
+class Player(pygame.sprite.Sprite):
+    """This represents the moving player"""
+    def __init__(self, x,y):
+        """Constructor"""
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y 
+        self.pos = pygame.Rect(x,y,10,10)
+        self.image = pygame.Surface([10,10])
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+
+
+class Enemy(pygame.sprite.Sprite):
+    """This is a static block that I will try to avoid"""
     def __init__(self, health, x, y):
+        """Constructor"""
         #self.x = random.randint(0,680)
         #self.y = random.randint(0,480)
+        pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
-        self.health = 100
-        self.pos = pygame.Rect(x,y,10,10)
+        self.health = health
+        self.pos = pygame.Rect(self.x,self.y,10,10)
+        self.image = pygame.Surface([10,10])
+        self.image.fill(BLACK)
+        self.rect = self.image.get_rect()
         
     def draw(self):
-        print "o.draw has been run!"
         enemyRect = pygame.Rect(self.x, self.y, 10,10)
-        pygame.draw.rect(DISPLAYSURF, BLUE, enemyRect)
-        pygame.display.update()
+        pygame.draw.rect(DISPLAYSURF, BLACK, enemyRect)
+        #pygame.display.update()
 
+#enemy_list = pygame.sprite.Group()
+enemy = Enemy(100,100,100) 
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 20)
     pygame.display.set_caption('Zoomr')
-    DISPLAYSURF.fill(BLACK)
-
+    DISPLAYSURF.fill(GREEN)
+       
     while True:
         runGame()
 
 def runGame():
-    DISPLAYSURF.fill(GREEN)
-
-    enemyObjects = []
-    for x in range (3):
-        x,y = getRandomCoords()
-        o = Enemy(100,x,y)
-        enemyObjects.append(o)
-        
-    for o in enemyObjects:
-        o.draw()
-        #pygame.display.update()
-
+    global movex, movey, enemy
+    
+    #DISPLAYSURF.fill(GREEN)
+    #player = Player(680/2,480/2)
+    #all_sprite_list.add(player)
+    #enemyObjects = []
+    #for x in range (8):
+    #    x,y = getRandomCoords()
+    #    o = Enemy(100,x,y)
+    #    enemy_list.add(o)
+    #    all_sprite_list.add(o)
+   
+    #for o in enemyObjects:
+    #    o.draw(draw)
+    #all_sprite_list.draw(DISPLAYSURF)
+    #pygame.display.update()
+    #enemy_list.draw(DISPLAYSURF)
+    pygame.display.flip()
 
     # start at a random point
-    playerStartx, playerStarty = getRandomCoords()
-    drawPlayer(playerStartx, playerStarty)
+    #playerStartx, playerStarty = getRandomCoords()
+    #drawPlayer(playerStartx, playerStarty)
     # start the bot at a random point
-    botStartx, botStarty = getRandomCoords()
-    drawBot(botStartx, botStarty)
-
-    while True:
+    #botStartx, botStarty = getRandomCoords()
+    #drawBot(botStartx, botStarty)
+    #enemy.draw()
+    #all_sprite_list.draw(DISPLAYSURF)
+ 
+            
+    
         #for o in enemyObjects:
         #    o.draw()
             #screen.blit(background, o.x, o.y)
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                terminate
-            elif event.type == KEYDOWN:
-                if event.key== K_ESCAPE:
-                    terminate()
-                elif event.key ==K_a:
-                    playerStartx-=10
-                elif event.key==K_d:
-                    playerStartx+=10
-                elif event.key==K_w:
-                    playerStarty-=10
-                elif event.key==K_s:
-                    playerStarty+=10
-            elif event.type ==KEYUP: 
-                break
+    
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            terminate()
+        if event.type == KEYDOWN:
+            if event.key== K_ESCAPE:
+                terminate()
+            if event.key ==K_a:
+               movex = -3 #playerStartx-=10
+            if event.key==K_d:
+                movex = 3 #playerStartx+=10
+            if event.key==K_w:
+                movey = -3 #playerStarty-=10
+            if event.key==K_s:
+                movey = 3 #playerStarty+=10
+            
+            
+        if (event.type==KEYUP):
+            if (event.key==K_a):
+                movex = 0 
+            if (event.key==K_d):
+                movex =0
+            if (event.key==K_w):
+                movey = 0
+            if (event.key==K_s):
+                movey=0
                 
-        drawPlayer(playerStartx, playerStarty)
-        botStartx, botStarty = moveBot(botStartx, botStarty)
-        botStartx, botStarty = checkBounds(botStartx, botStarty)
-        drawBot(botStartx, botStarty)
-        pygame.display.update()
+    enemy.x += movex
+    enemy.y += movey
+    DISPLAYSURF.fill(GREEN)
+    enemy.draw()
+    pygame.display.flip()
+
+               
+        #drawPlayer(playerStartx, playerStarty)
+        #botStartx, botStarty = moveBot(botStartx, botStarty)
+        #botStartx, botStarty = checkBounds(botStartx, botStarty)
+        #drawBot(botStartx, botStarty)
+        #pygame.display.update()
         #DISPLAYSURF.fill(GREEN)
-        for o in enemyObjects:
-            o.draw()
+
+        # Somewhere here, I think I need to create a background based on the DISPLAYSURF.
+        #for o in enemyObjects:
+        #    o.draw()
+        # Perhaps I need to differentiate between screen (DISPLAYSURF) and a background (a graphic)
         
-        
+
+
+
 def checkBounds(x,y):
     if x > 680:
         x = 680

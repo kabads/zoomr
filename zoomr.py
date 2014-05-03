@@ -18,19 +18,14 @@ BLUE = (0,0,255)
 movex, movey=0,0
 all_sprite_list = pygame.sprite.Group()
 
-playerStartx = 0 
-playerStarty = 0
-
-
-
-
 class Player(pygame.sprite.Sprite):
     """This represents the moving player"""
     def __init__(self, x,y):
         """Constructor"""
         pygame.sprite.Sprite.__init__(self)
         self.x = x
-        self.y = y 
+        self.y = y
+        self.health= 100
         self.pos = pygame.Rect(x,y,10,10)
         self.image = pygame.Surface([10,10])
         self.image.fill(RED)
@@ -51,6 +46,15 @@ class Player(pygame.sprite.Sprite):
             self.y=0
 
 
+    def damage(self):
+        self.health -= 10
+        if self.health <=0:
+            print "you died"
+            #terminate()
+
+
+
+
 class Enemy(pygame.sprite.Sprite):
     """This is a static block that I will try to avoid"""
     def __init__(self):
@@ -68,6 +72,7 @@ class Enemy(pygame.sprite.Sprite):
         enemyRect = pygame.Rect(self.x, self.y, 10,10)
         pygame.draw.rect(DISPLAYSURF, BLACK, enemyRect)
         #pygame.display.update()
+
 
     def checkBounds(self):
         if self.x >= 670:
@@ -99,7 +104,7 @@ def main():
     player.draw()
 
     # And here are some enemies - -don't touch them (still to come)
-    for x in range (8):
+    for x in range (20):
         #x,y = getRandomCoords()
         o = Enemy()
         o.draw()
@@ -111,33 +116,6 @@ def main():
 
 def runGame():
     global movex, movey, enemy, player
-    
-    #DISPLAYSURF.fill(GREEN)
-    #player = Player(680/2,480/2)
-    #all_sprite_list.add(player)
-
-   
-    #for o in enemyObjects:
-    #    o.draw(draw)
-    #all_sprite_list.draw(DISPLAYSURF)
-    #pygame.display.update()
-    #enemy_list.draw(DISPLAYSURF)
-    #pygame.display.flip()
-
-    # start at a random point
-    #playerStartx, playerStarty = getRandomCoords()
-    #drawPlayer(playerStartx, playerStarty)
-    # start the bot at a random point
-    #botStartx, botStarty = getRandomCoords()
-    #drawBot(botStartx, botStarty)
-    #enemy.draw()
-    #all_sprite_list.draw(DISPLAYSURF)
- 
-            
-    
-        #for o in enemyObjects:
-        #    o.draw()
-            #screen.blit(background, o.x, o.y)
     
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -171,27 +149,13 @@ def runGame():
     DISPLAYSURF.fill(GREEN)
     player.draw()
     
+    
     for o in enemy_list:
         o.draw()
-    
-    #enemy.checkBounds()
-    #enemy.draw()
+        if pygame.sprite.collide_rect(player, o)==True:
+            print "careful " + str(player.health)
+            player.damage()
     pygame.display.flip()
-
-               
-        #drawPlayer(playerStartx, playerStarty)
-        #botStartx, botStarty = moveBot(botStartx, botStarty)
-        #botStartx, botStarty = checkBounds(botStartx, botStarty)
-        #drawBot(botStartx, botStarty)
-        #pygame.display.update()
-        #DISPLAYSURF.fill(GREEN)
-
-        # Somewhere here, I think I need to create a background based on the DISPLAYSURF.
-        #for o in enemyObjects:
-        #    o.draw()
-        # Perhaps I need to differentiate between screen (DISPLAYSURF) and a background (a graphic)
-        
-
 
 
 def checkBounds(x,y):
@@ -224,15 +188,6 @@ def getRandomCoords():
     x = random.randint(0,680)
     y = random.randint(0,480)
     return x, y
-
-def drawPlayer(x,y):
-    playerRect = pygame.Rect(x,y,10,10)
-    pygame.draw.rect(DISPLAYSURF, WHITE, playerRect)
-
-
-def drawBot(x,y):
-    botRect = pygame.Rect(x,y,10,10)
-    pygame.draw.rect(DISPLAYSURF, RED, botRect)
 
 def terminate():
     pygame.quit()

@@ -36,17 +36,29 @@ class Player(pygame.sprite.Sprite):
         self.image.fill(RED)
         self.rect = self.image.get_rect()
 
+    def draw(self):
+        playerRect = pygame.Rect(self.x, self.y, 10,10)
+        pygame.draw.rect(DISPLAYSURF, RED, playerRect)
+
+    def checkBounds(self):
+        if self.x >= 670:
+            self.x = 670
+        elif self.x <=0:
+            self.x = 0
+        if self.y >= 470:
+            self.y = 470
+        elif self.y<=0:
+            self.y=0
+
 
 class Enemy(pygame.sprite.Sprite):
     """This is a static block that I will try to avoid"""
-    def __init__(self, health, x, y):
+    def __init__(self):
         """Constructor"""
-        #self.x = random.randint(0,680)
-        #self.y = random.randint(0,480)
+        self.x = random.randint(0,680-10)
+        self.y = random.randint(0,480-10)
         pygame.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
-        self.health = health
+        self.health = random.randint(0,100)
         self.pos = pygame.Rect(self.x,self.y,10,10)
         self.image = pygame.Surface([10,10])
         self.image.fill(BLACK)
@@ -67,39 +79,50 @@ class Enemy(pygame.sprite.Sprite):
         elif self.y<=0:
             self.y=0
 
-#enemy_list = pygame.sprite.Group()
-enemy = Enemy(100,100,100) 
+enemy_list = pygame.sprite.Group()
+
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy, player
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 20)
     pygame.display.set_caption('Zoomr')
     DISPLAYSURF.fill(GREEN)
-       
+
+    enemyObjects = []
+    # Let's make the background green for now, and then draw everything afterwards. 
+    DISPLAYSURF.fill(GREEN)
+    
+    # Here is the player - protagonist
+    player = Player(680/2, 480/2)
+    player.draw()
+
+    # And here are some enemies - -don't touch them (still to come)
+    for x in range (8):
+        #x,y = getRandomCoords()
+        o = Enemy()
+        o.draw()
+        enemy_list.add(o)
+        all_sprite_list.add(o)
+        pygame.display.flip()   
     while True:
         runGame()
 
 def runGame():
-    global movex, movey, enemy
+    global movex, movey, enemy, player
     
     #DISPLAYSURF.fill(GREEN)
     #player = Player(680/2,480/2)
     #all_sprite_list.add(player)
-    #enemyObjects = []
-    #for x in range (8):
-    #    x,y = getRandomCoords()
-    #    o = Enemy(100,x,y)
-    #    enemy_list.add(o)
-    #    all_sprite_list.add(o)
+
    
     #for o in enemyObjects:
     #    o.draw(draw)
     #all_sprite_list.draw(DISPLAYSURF)
     #pygame.display.update()
     #enemy_list.draw(DISPLAYSURF)
-    pygame.display.flip()
+    #pygame.display.flip()
 
     # start at a random point
     #playerStartx, playerStarty = getRandomCoords()
@@ -142,11 +165,17 @@ def runGame():
             if (event.key==K_s):
                 movey=0
                 
-    enemy.x += movex
-    enemy.y += movey
+    player.x += movex
+    player.y += movey
+    player.checkBounds()
     DISPLAYSURF.fill(GREEN)
-    enemy.checkBounds()
-    enemy.draw()
+    player.draw()
+    
+    for o in enemy_list:
+        o.draw()
+    
+    #enemy.checkBounds()
+    #enemy.draw()
     pygame.display.flip()
 
                

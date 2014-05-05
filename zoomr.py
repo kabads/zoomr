@@ -18,12 +18,26 @@ BLUE = (0,0,255)
 movex, movey=0,0
 all_sprite_list = pygame.sprite.Group()
 
+class Goal(pygame.sprite.Sprite):
+    """This is what the player will be pursuing"""
+    def __init__(self):
+        """Constructor"""
+        pygame.sprite.Sprite.__init__(self)
+        x = random.randint(0,680)
+        y = random.randint(0,480)
+        self.image = pygame.image.load("yellow.jpg")
+        self.rect = self.image.get_rect()
+        self.rect.topleft = [x,y]
+
+    def draw(self):
+        DISPLAYSURF.blit(self.image, (self.x,self.y))
+
 class Player(pygame.sprite.Sprite):
     """This represents the moving player"""
     def __init__(self, x,y):
         """Constructor"""
         pygame.sprite.Sprite.__init__(self)
-        self.health= 100
+        self.health= 30
         self.image = pygame.image.load("blue.jpg")
         self.rect = self.image.get_rect()
         self.rect.topleft = [x,y]
@@ -47,9 +61,9 @@ class Player(pygame.sprite.Sprite):
     def damage(self):
         self.health -= 10
         #"you're hit"
-        #if self.health <=0:
-            #print "you died"
-            #terminate()
+        if self.health <=0:
+            print "you died"
+            terminate()
 
 
 
@@ -77,6 +91,7 @@ class Enemy(pygame.sprite.Sprite):
 
 enemy_list = pygame.sprite.Group()
 player_list = pygame.sprite.Group()
+goal_list = pygame.sprite.Group()
 
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy, player, enemy_list
@@ -89,13 +104,18 @@ def main():
     # Let's make the background green for now, and then draw everything afterwards. 
     DISPLAYSURF.fill(GREEN)
     
+    # We need a goal to aim for - a yellow square
+    goal = Goal()
+    goal_list.add(goal)
+    all_sprite_list.add(goal)
+    
     # Here is the player - protagonist
     player = Player(680/2, 480/2)
     player_list.add(player)
     all_sprite_list.add(player)
 
     # And here are some enemies - -don't touch them (still to come)
-    for x in range (20):
+    for x in range (100):
         o = Enemy()
         enemy_list.add(o)
         all_sprite_list.add(o)
@@ -140,13 +160,16 @@ def runGame():
 
     enemy_list.draw(DISPLAYSURF)
     player_list.draw(DISPLAYSURF)
-
-    # Draw the enemies and check for a collision
+    goal_list.draw(DISPLAYSURF)
+    # Check for a collision
     # However, I'm so stupid, because these should never live above the DISPLAYSURF.fill
     for o in enemy_list:
         if pygame.sprite.groupcollide(player_list, enemy_list, False, True):
             print "careful " + str(player.health)
             player.damage()
+    if pygame.sprite.groupcollide(player_list, goal_list, False, False):
+        print "you win" 
+        terminate()
     #hits = pygame.sprite.spritecollide(player, enemy_list, True)
         #print "collision"
     #for i in hits:

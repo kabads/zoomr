@@ -23,29 +23,25 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x,y):
         """Constructor"""
         pygame.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
         self.health= 100
-        self.pos = pygame.Rect(x,y,10,10)
-        self.image = pygame.Surface([10,10])
-        self.image.fill(RED)
+        self.image = pygame.image.load("blue.jpg")
         self.rect = self.image.get_rect()
-        self.i1 = pygame.image.load("blue.jpg")
+        self.rect.topleft = [x,y]
 
-    def draw(self):
-        #playerRect = pygame.Rect(self.x, self.y, 10,10)
-        #pygame.draw.rect(DISPLAYSURF, RED, playerRect)
-        DISPLAYSURF.blit(self.i1, (self.x,self.y))
+
+    def update(self):
+        self.checkBounds()
+        self.rect.move_ip([movex, movey])
 
     def checkBounds(self):
-        if self.x >= 670:
-            self.x = 670
-        elif self.x <=0:
-            self.x = 0
-        if self.y >= 470:
-            self.y = 470
-        elif self.y<=0:
-            self.y=0
+        if self.rect.x >= 670:
+            self.rect.x = 670
+        elif self.rect.x <=0:
+            self.rect.x = 0
+        if self.rect.y >= 470:
+            self.rect.y = 470
+        elif self.rect.y<=0:
+            self.rect.y=0
 
 
     def damage(self):
@@ -62,16 +58,14 @@ class Enemy(pygame.sprite.Sprite):
     """This is a static block that I will try to avoid"""
     def __init__(self):
         """Constructor"""
-        self.x = random.randint(0,680-10)
-        self.y = random.randint(0,480-10)
+        x = random.randint(0,680-10)
+        y = random.randint(0,480-10)
         pygame.sprite.Sprite.__init__(self)
         self.health = random.randint(0,100)
-        self.pos = pygame.Rect(self.x,self.y,10,10)
-        self.image = pygame.Surface([10,10])
-        self.image.fill(BLACK)
+        self.image = pygame.image.load("red.jpg")
         self.rect = self.image.get_rect()
-        self.i1 = pygame.image.load("red.jpg")
-
+        self.rect.topleft = [x,y]
+        
     def draw(self):
         #enemyRect = pygame.Rect(self.x, self.y, 10,10)
         #pygame.draw.rect(DISPLAYSURF, BLACK, enemyRect)
@@ -79,10 +73,10 @@ class Enemy(pygame.sprite.Sprite):
         #print "I just drew an enemy"
         DISPLAYSURF.blit(self.i1, (self.x,self.y))
 
-    #def checkHit(self):
-    #    if 
+
 
 enemy_list = pygame.sprite.Group()
+player_list = pygame.sprite.Group()
 
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy, player, enemy_list
@@ -97,12 +91,12 @@ def main():
     
     # Here is the player - protagonist
     player = Player(680/2, 480/2)
-    player.draw()
+    player_list.add(player)
+    all_sprite_list.add(player)
 
     # And here are some enemies - -don't touch them (still to come)
     for x in range (20):
         o = Enemy()
-        o.draw()
         enemy_list.add(o)
         all_sprite_list.add(o)
         pygame.display.flip()   
@@ -141,11 +135,16 @@ def runGame():
     # Let's start to draw everything back on the screen - always starting with the background
     DISPLAYSURF.fill(GREEN)
 
+    enemy_list.update()
+    player_list.update()
+
+    enemy_list.draw(DISPLAYSURF)
+    player_list.draw(DISPLAYSURF)
+
     # Draw the enemies and check for a collision
     # However, I'm so stupid, because these should never live above the DISPLAYSURF.fill
     for o in enemy_list:
-        o.draw()
-        if pygame.sprite.collide_rect(player, o)==True:
+        if pygame.sprite.groupcollide(player_list, enemy_list, False, True):
             print "careful " + str(player.health)
             player.damage()
     #hits = pygame.sprite.spritecollide(player, enemy_list, True)
@@ -153,13 +152,8 @@ def runGame():
     #for i in hits:
     #    player.damage()
     
-    player.x += movex
-    player.y += movey
-    player.checkBounds()
 
-    player.draw()
-    for o in enemy_list:
-        o.draw
+
     #hits = pygame.sprite.spritecollide(player, enemy_list, True)
     #print "hits is this long: " + str(len(hits))
     #for i in hits:

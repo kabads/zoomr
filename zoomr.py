@@ -30,10 +30,12 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.Surface([10,10])
         self.image.fill(RED)
         self.rect = self.image.get_rect()
+        self.i1 = pygame.image.load("blue.jpg")
 
     def draw(self):
-        playerRect = pygame.Rect(self.x, self.y, 10,10)
-        pygame.draw.rect(DISPLAYSURF, RED, playerRect)
+        #playerRect = pygame.Rect(self.x, self.y, 10,10)
+        #pygame.draw.rect(DISPLAYSURF, RED, playerRect)
+        DISPLAYSURF.blit(self.i1, (self.x,self.y))
 
     def checkBounds(self):
         if self.x >= 670:
@@ -48,8 +50,9 @@ class Player(pygame.sprite.Sprite):
 
     def damage(self):
         self.health -= 10
-        if self.health <=0:
-            print "you died"
+        #"you're hit"
+        #if self.health <=0:
+            #print "you died"
             #terminate()
 
 
@@ -67,35 +70,28 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.Surface([10,10])
         self.image.fill(BLACK)
         self.rect = self.image.get_rect()
-        
+        self.i1 = pygame.image.load("red.jpg")
+
     def draw(self):
-        enemyRect = pygame.Rect(self.x, self.y, 10,10)
-        pygame.draw.rect(DISPLAYSURF, BLACK, enemyRect)
+        #enemyRect = pygame.Rect(self.x, self.y, 10,10)
+        #pygame.draw.rect(DISPLAYSURF, BLACK, enemyRect)
         #pygame.display.update()
+        #print "I just drew an enemy"
+        DISPLAYSURF.blit(self.i1, (self.x,self.y))
 
-
-    def checkBounds(self):
-        if self.x >= 670:
-            self.x = 670
-        elif self.x <=0:
-            self.x = 0
-        if self.y >= 470:
-            self.y = 470
-        elif self.y<=0:
-            self.y=0
+    #def checkHit(self):
+    #    if 
 
 enemy_list = pygame.sprite.Group()
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy, player
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy, player, enemy_list
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 20)
-    pygame.display.set_caption('Zoomr')
-    DISPLAYSURF.fill(GREEN)
-
-    enemyObjects = []
+    pygame.display.set_caption('Zoomr - where can you go today?')
+    
     # Let's make the background green for now, and then draw everything afterwards. 
     DISPLAYSURF.fill(GREEN)
     
@@ -105,7 +101,6 @@ def main():
 
     # And here are some enemies - -don't touch them (still to come)
     for x in range (20):
-        #x,y = getRandomCoords()
         o = Enemy()
         o.draw()
         enemy_list.add(o)
@@ -113,9 +108,9 @@ def main():
         pygame.display.flip()   
     while True:
         runGame()
-
+hits = []
 def runGame():
-    global movex, movey, enemy, player
+    global movex, movey, enemy, player, enemy_list, hits
     
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -142,47 +137,35 @@ def runGame():
                 movey = 0
             if (event.key==K_s):
                 movey=0
-                
-    player.x += movex
-    player.y += movey
-    player.checkBounds()
+
+    # Let's start to draw everything back on the screen - always starting with the background
     DISPLAYSURF.fill(GREEN)
-    player.draw()
-    
-    
+
+    # Draw the enemies and check for a collision
+    # However, I'm so stupid, because these should never live above the DISPLAYSURF.fill
     for o in enemy_list:
         o.draw()
         if pygame.sprite.collide_rect(player, o)==True:
             print "careful " + str(player.health)
             player.damage()
+    #hits = pygame.sprite.spritecollide(player, enemy_list, True)
+        #print "collision"
+    #for i in hits:
+    #    player.damage()
+    
+    player.x += movex
+    player.y += movey
+    player.checkBounds()
+
+    player.draw()
+    for o in enemy_list:
+        o.draw
+    #hits = pygame.sprite.spritecollide(player, enemy_list, True)
+    #print "hits is this long: " + str(len(hits))
+    #for i in hits:
+    #    player.damage()
+    # update the whole shebang
     pygame.display.flip()
-
-
-def checkBounds(x,y):
-    if x > 680:
-        x = 680
-    if y > 480:
-        y = 480
-    if x <= 0:
-        x = 0
-    if y <= 0: 
-        y = 0
-    return(x,y)
-
-def moveBot(x,y):
-    direction = random.randint(0,3)
-    if direction ==0:
-        x-=1
-        return(x,y)
-    elif direction ==1: 
-        x+=1 
-        return(x,y)
-    elif direction ==2:
-        y-=1
-        return(x,y)
-    elif direction ==3:
-        y+=1 
-        return(x,y)
         
 def getRandomCoords():
     x = random.randint(0,680)

@@ -63,8 +63,8 @@ class Player(pygame.sprite.Sprite):
         self.health -= 10
         print "Player health: " + str(self.health)
         if self.health <=0:
-            print "you died"
-            terminate()
+            playerDies(enemy_list, player_list, goal_list)
+            #terminate()
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -122,7 +122,6 @@ def runGame():
             if event.key==K_s:
                 movey = 1 #playerStarty+=10
             
-            
         if (event.type==KEYUP):
             if (event.key==K_a):
                 movex = 0 
@@ -179,6 +178,23 @@ def setUpGame():
         all_sprite_list.add(o)
         pygame.display.flip()      
 
+def playerDies(enemies, player, goal):
+    global score
+    quitGame(enemies, player, goal)
+    endGameSurf = BASICFONT.render('Game Over', True, BLACK)
+    endGameRect = endGameSurf.get_rect()
+    endGameRect.topleft = (WINWIDTH/2, WINHEIGHT/2)
+    DISPLAYSURF.fill(GREEN)
+    DISPLAYSURF.blit(endGameSurf, endGameRect)
+    a= 0
+    while a==0:
+        if pygame.event.get()==0:
+            a = 0 # clear event queue
+        else:
+            a = 1
+            score = 0
+            setUpGame()
+
 def displayScore(score):
     #print "display score has been called: " + str(BASICFONT)  + " display surf: " + str(DISPLAYSURF)
     displayScoreSurf = BASICFONT.render('Score: ' + str(score), True, BLACK)
@@ -187,11 +203,12 @@ def displayScore(score):
     DISPLAYSURF.blit(displayScoreSurf, displayScoreRect)
 
 def quitGame(enemies, player, goal):
-    enemies.empty()
-    player.empty()
-    goal.empty()
-    DISPLAYSURF.fill(GREEN)
-    runGame()
+    # We are not ending the program, just the current game
+    enemies.empty() #  delete the enemies in the enemies list
+    player.empty()  # delete the player in the player list
+    goal.empty() # delete the goal in the goal list
+    DISPLAYSURF.fill(GREEN) # refill the screen
+    runGame() 
         
 def getRandomCoords():
     x = random.randint(0,680)

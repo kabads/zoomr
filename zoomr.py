@@ -17,6 +17,7 @@ GREEN = (50,155,0)
 BLUE = (0,0,255)
 movex, movey=0,0
 all_sprite_list = pygame.sprite.Group()
+rounds = 0 # This will count the number of rounds a player has had. 
 
 class Goal(pygame.sprite.Sprite):
     """This is what the player will be pursuing"""
@@ -66,8 +67,6 @@ class Player(pygame.sprite.Sprite):
             terminate()
 
 
-
-
 class Enemy(pygame.sprite.Sprite):
     """This is a static block that I will try to avoid"""
     def __init__(self):
@@ -92,39 +91,21 @@ class Enemy(pygame.sprite.Sprite):
 enemy_list = pygame.sprite.Group()
 player_list = pygame.sprite.Group()
 goal_list = pygame.sprite.Group()
-
+score = 0
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy, player, enemy_list
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy, player, enemy_list, score
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
     BASICFONT = pygame.font.Font('freesansbold.ttf', 20)
     pygame.display.set_caption('Zoomr - where can you go today?')
     
-    # Let's make the background green for now, and then draw everything afterwards. 
-    DISPLAYSURF.fill(GREEN)
-    
-    # We need a goal to aim for - a yellow square
-    goal = Goal()
-    goal_list.add(goal)
-    all_sprite_list.add(goal)
-    
-    # Here is the player - protagonist
-    player = Player(680/2, 480/2)
-    player_list.add(player)
-    all_sprite_list.add(player)
-
-    # And here are some enemies - -don't touch them (still to come)
-    for x in range (100):
-        o = Enemy()
-        enemy_list.add(o)
-        all_sprite_list.add(o)
-        pygame.display.flip()   
+    setUpGame()
     while True:
         runGame()
 hits = []
 def runGame():
-    global movex, movey, enemy, player, enemy_list, hits
+    global movex, movey, enemy, player, enemy_list, hits, DISPLAYSURF, score
     
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -154,7 +135,7 @@ def runGame():
 
     # Let's start to draw everything back on the screen - always starting with the background
     DISPLAYSURF.fill(GREEN)
-
+    displayScore(score)
     enemy_list.update()
     player_list.update()
 
@@ -169,20 +150,47 @@ def runGame():
             player.damage()
     if pygame.sprite.groupcollide(player_list, goal_list, False, False):
         print "you win" 
-        terminate()
-    #hits = pygame.sprite.spritecollide(player, enemy_list, True)
-        #print "collision"
-    #for i in hits:
-    #    player.damage()
-    
-
-
-    #hits = pygame.sprite.spritecollide(player, enemy_list, True)
-    #print "hits is this long: " + str(len(hits))
-    #for i in hits:
-    #    player.damage()
-    # update the whole shebang
+        score +=1
+        quitGame(enemy_list, player_list, goal_list)
+        setUpGame()
     pygame.display.flip()
+
+def setUpGame():
+    """This will set up the screen to begin the game - we need to get this out of the loop so we can have difficulty rounds"""
+    global enemy_list, score, DISPLAYSURF, BASICFONT, FPSCLOCK
+    # Let's make the background green for now, and then draw everything afterwards. 
+    DISPLAYSURF.fill(GREEN)
+    
+    # We need a goal to aim for - a yellow square
+    goal = Goal()
+    goal_list.add(goal)
+    all_sprite_list.add(goal)
+    
+    # Here is the player - protagonist
+    player = Player(680/2, 480/2)
+    player_list.add(player)
+    all_sprite_list.add(player)
+
+    # And here are some enemies - -don't touch them (still to come)
+    for x in range (100):
+        o = Enemy()
+        enemy_list.add(o)
+        all_sprite_list.add(o)
+        pygame.display.flip()      
+
+def displayScore(score):
+    #print "display score has been called: " + str(BASICFONT)  + " display surf: " + str(DISPLAYSURF)
+    displayScoreSurf = BASICFONT.render('Score: ' + str(score), True, BLACK)
+    displayScoreRect = displayScoreSurf.get_rect()
+    #displayScoreRect.topleft = (WINWIDTH -10, WINHEIGHT-10)
+    DISPLAYSURF.blit(displayScoreSurf, displayScoreRect)
+
+def quitGame(enemies, player, goal):
+    enemies.empty()
+    player.empty()
+    goal.empty()
+    DISPLAYSURF.fill(GREEN)
+    runGame()
         
 def getRandomCoords():
     x = random.randint(0,680)

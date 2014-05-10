@@ -61,7 +61,7 @@ class Player(pygame.sprite.Sprite):
 
     def damage(self):
         self.health -= 10
-        #"you're hit"
+        print "Player health: " + str(self.health)
         if self.health <=0:
             print "you died"
             terminate()
@@ -146,8 +146,9 @@ def runGame():
     # However, I'm so stupid, because these should never live above the DISPLAYSURF.fill
     for o in enemy_list:
         if pygame.sprite.groupcollide(player_list, enemy_list, False, True):
-            print "careful " + str(player.health)
-            player.damage()
+            #print "careful " + str(player.health)
+            for a in player_list:
+                a.damage()
     if pygame.sprite.groupcollide(player_list, goal_list, False, False):
         print "you win" 
         score +=1

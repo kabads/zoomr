@@ -37,6 +37,7 @@ class Player(pygame.sprite.Sprite):
     """This represents the moving player"""
     def __init__(self, x,y):
         """Constructor"""
+        self.alive = True
         pygame.sprite.Sprite.__init__(self)
         self.health= 30
         self.image = pygame.image.load("blue.jpg")
@@ -63,7 +64,9 @@ class Player(pygame.sprite.Sprite):
         self.health -= 10
         print "Player health: " + str(self.health)
         if self.health <=0:
-            playerDies(enemy_list, player_list, goal_list)
+            self.alive=False
+            #playerDies(enemy_list, player_list, goal_list)
+            #setUpGame()
             #terminate()
 
 
@@ -93,7 +96,7 @@ player_list = pygame.sprite.Group()
 goal_list = pygame.sprite.Group()
 score = 0
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy, player, enemy_list, score
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy, player, enemy_list, score, player_list, goal_list
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
@@ -102,10 +105,17 @@ def main():
     
     setUpGame()
     while True:
-        runGame()
+        if player.alive == True:
+            runGame()
+        else:
+            quitGame(enemy_list, player_list, goal_list)
+            DISPLAYSURF.fill(GREEN)
+            showGameOver()
+            pygame.display.flip()
+            setUpGame()
 hits = []
 def runGame():
-    global movex, movey, enemy, player, enemy_list, hits, DISPLAYSURF, score
+    global movex, movey, enemy, player, enemy_list, hits, DISPLAYSURF, score, player_list, goal_list
     
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -132,6 +142,29 @@ def runGame():
             if (event.key==K_s):
                 movey=0
 
+    # Just check what state the player is in - if he is not alive, then wait for a key press with game over on the screen
+    if player.alive == False:
+        quitGame(enemy_list, player_list, goal_list)
+        font = pygame.font.Font('freesansbold.ttf', 20)
+        text = font.render("Game Over", 1, (10,10,10))
+        textpos = text.get_rect(centerx = DISPLAYSURF.get_width()/2)
+        DISPLAYSURF.fill(BLUE)
+        DISPLAYSURF.blit(text, textpos)
+        #waiting = checkForKeyPress()
+        #while waiting == False:
+        #    print "still waiting for that key " + str(waiting)
+        #    waiting = checkForKeyPress()
+        #    DISPLAYSURF.fill(BLUE)
+        #setUpGame()
+        pygame.time.wait(500)
+
+
+        while True:
+            if checkForKeyPress():
+                pygame.event.get() # clear event queue
+                return
+                #setUpGame()
+
     # Let's start to draw everything back on the screen - always starting with the background
     DISPLAYSURF.fill(GREEN)
     displayScore(score)
@@ -157,7 +190,7 @@ def runGame():
 
 def setUpGame():
     """This will set up the screen to begin the game - we need to get this out of the loop so we can have difficulty rounds"""
-    global enemy_list, score, DISPLAYSURF, BASICFONT, FPSCLOCK
+    global enemy_list, score, DISPLAYSURF, BASICFONT, FPSCLOCK, player
     # Let's make the background green for now, and then draw everything afterwards. 
     DISPLAYSURF.fill(GREEN)
     
@@ -178,22 +211,39 @@ def setUpGame():
         all_sprite_list.add(o)
         pygame.display.flip()      
 
+def showGameOver():
+    font = pygame.font.Font('freesansbold.ttf', 20)
+    text = font.render('Game Over', 1, (10,10,10))
+    textpos = text.get_rect(centerx=DISPLAYSURF.get_width()/2)
+    DISPLAYSURF.fill(GREEN)
+    DISPLAYSURF.blit(text, textpos)
+    pygame.display.flip()
+    pygame.time.wait(2000)
+    return
+
 def playerDies(enemies, player, goal):
     global score
+    print "player dies called"
     quitGame(enemies, player, goal)
-    endGameSurf = BASICFONT.render('Game Over', True, BLACK)
-    endGameRect = endGameSurf.get_rect()
-    endGameRect.topleft = (WINWIDTH/2, WINHEIGHT/2)
+    font = pygame.font.Font('freesansbold.ttf', 20)
+    text = font.render("Game Over", 1, (10,10,10))
+    textpos = text.get_rect(centerx = DISPLAYSURF.get_width()/2)
+    
+    #endGameSurf = BASICFONT.render('Game Over', True, BLACK)
+    #endGameRect = endGameSurf.get_rect()
+    #endGameRect.topleft = (100,100)
+    checkForKeyPress()
     DISPLAYSURF.fill(GREEN)
-    DISPLAYSURF.blit(endGameSurf, endGameRect)
-    a= 0
-    while a==0:
-        if pygame.event.get()==0:
-            a = 0 # clear event queue
-        else:
-            a = 1
-            score = 0
-            setUpGame()
+    #DISPLAYSURF.blit(endGameSurf, endGameRect)
+    DISPLAYSURF.blit(text, textpos)
+    pygame.time.wait(500)
+    check = checkForKeyPress()
+    while check == True:
+        check= checkForKeyPress()
+        pygame.event.get() # clear event queue
+        #return 
+    return
+    #setUpGame()
 
 def displayScore(score):
     #print "display score has been called: " + str(BASICFONT)  + " display surf: " + str(DISPLAYSURF)
@@ -204,12 +254,42 @@ def displayScore(score):
 
 def quitGame(enemies, player, goal):
     # We are not ending the program, just the current game
+    #print "there are "+  str(len(enemies))
     enemies.empty() #  delete the enemies in the enemies list
+    #print "there are "+  str(len(enemies))
     player.empty()  # delete the player in the player list
     goal.empty() # delete the goal in the goal list
     DISPLAYSURF.fill(GREEN) # refill the screen
-    runGame() 
-        
+    pygame.display.flip()
+    return 
+
+#def checkForKeyPress():
+#    """Calling this function will check if a key has recently been pressed. If so, the key is returned.
+#    If not, then False is returned. If the Esc key was pressed, then the program terminates."""
+#    keyUpEvents = pygame.event.get(KEYUP)
+#    if len(keyUpEvents)==0:
+#        return True
+#    elif keyUpEvents[0].key == K_ESCAPE:
+#        terminate()
+#    #return keyUpEvents[0].key
+#    else:
+#        return False
+
+
+
+
+def checkForKeyPress():
+    if len(pygame.event.get(QUIT)) > 0:
+        terminate()
+
+    keyUpEvents = pygame.event.get(KEYUP)
+    if len(keyUpEvents) == 0:
+        return None
+    if keyUpEvents[0].key == K_ESCAPE:
+        terminate()
+    return keyUpEvents[0].key
+
+
 def getRandomCoords():
     x = random.randint(0,680)
     y = random.randint(0,480)

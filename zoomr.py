@@ -24,8 +24,8 @@ class Goal(pygame.sprite.Sprite):
     def __init__(self):
         """Constructor"""
         pygame.sprite.Sprite.__init__(self)
-        x = random.randint(0,680)
-        y = random.randint(0,480)
+        x = random.randint(0,680-10)
+        y = random.randint(0,480-10)
         self.image = pygame.image.load("yellow.jpg")
         self.rect = self.image.get_rect()
         self.rect.topleft = [x,y]

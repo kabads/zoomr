@@ -19,6 +19,7 @@ movex, movey=0,0
 all_sprite_list = pygame.sprite.Group()
 rounds = 0 # This will count the number of rounds a player has had. 
 
+
 class Goal(pygame.sprite.Sprite):
     """This is what the player will be pursuing"""
     def __init__(self):
@@ -33,6 +34,7 @@ class Goal(pygame.sprite.Sprite):
     def draw(self):
         DISPLAYSURF.blit(self.image, (self.x,self.y))
 
+
 class Player(pygame.sprite.Sprite):
     """This represents the moving player"""
     def __init__(self, x,y):
@@ -44,12 +46,13 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = [x,y]
 
-
     def update(self):
+        """Move the player to where they need to be."""
         self.checkBounds()
         self.rect.move_ip([movex, movey])
 
     def checkBounds(self):
+        """Need to make sure that I don't hit the edge of the screen. This method prevents that. """
         if self.rect.x >= 670:
             self.rect.x = 670
         elif self.rect.x <=0:
@@ -59,10 +62,11 @@ class Player(pygame.sprite.Sprite):
         elif self.rect.y<=0:
             self.rect.y=0
 
-
     def damage(self):
+        """This method will damage the player because they hit an enemy. They will take some damage.
+        If damage gets to zero, then the player will die."""
         self.health -= 10
-        print "Player health: " + str(self.health)
+        #print "Player health: " + str(self.health)
         if self.health <=0:
             self.alive=False
             #playerDies(enemy_list, player_list, goal_list)
@@ -76,6 +80,8 @@ class Enemy(pygame.sprite.Sprite):
         """Constructor"""
         x = random.randint(0,680-10)
         y = random.randint(0,480-10)
+        self.x = x
+        self.y = y
         pygame.sprite.Sprite.__init__(self)
         self.health = random.randint(0,100)
         self.image = pygame.image.load("red.jpg")
@@ -83,19 +89,25 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.topleft = [x,y]
         
     def draw(self):
+        """This draws the player."""
         #enemyRect = pygame.Rect(self.x, self.y, 10,10)
         #pygame.draw.rect(DISPLAYSURF, BLACK, enemyRect)
         #pygame.display.update()
         #print "I just drew an enemy"
         DISPLAYSURF.blit(self.i1, (self.x,self.y))
 
+    def wobble(self):
+        # if we get to a particular level, we will 'wobble' the enemies and they may kill each other off - experimental
 
+        return()
 
 enemy_list = pygame.sprite.Group()
 player_list = pygame.sprite.Group()
 goal_list = pygame.sprite.Group()
 score = 0
 difficulty = 1
+
+
 def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT, movex, movey, enemy, player, enemy_list, score, player_list, goal_list, difficulty
     pygame.init()
@@ -115,6 +127,8 @@ def main():
             pygame.display.flip()
             setUpGame(difficulty)
 hits = []
+
+
 def runGame():
     global movex, movey, enemy, player, enemy_list, hits, DISPLAYSURF, score, player_list, goal_list, difficulty
     
@@ -122,29 +136,29 @@ def runGame():
         if event.type == QUIT:
             terminate()
         if event.type == KEYDOWN:
-            if event.key== K_ESCAPE:
+            if event.key == K_ESCAPE:
                 terminate()
-            if event.key ==K_a:
-               movex = -1 #playerStartx-=10
-            if event.key==K_d:
-                movex = 1 #playerStartx+=10
-            if event.key==K_w:
-                movey = -1 #playerStarty-=10
-            if event.key==K_s:
-                movey = 1 #playerStarty+=10
+            if event.key == K_a:
+               movex = -1  # playerStartx-=10
+            if event.key == K_d:
+                movex = 1  # playerStartx+=10
+            if event.key == K_w:
+                movey = -1  # playerStarty-=10
+            if event.key == K_s:
+                movey = 1  # playerStarty+=10
             
-        if (event.type==KEYUP):
-            if (event.key==K_a):
+        if event.type == KEYUP:
+            if event.key == K_a:
                 movex = 0 
-            if (event.key==K_d):
+            if event.key == K_d:
                 movex =0
-            if (event.key==K_w):
+            if event.key == K_w:
                 movey = 0
-            if (event.key==K_s):
+            if event.key == K_s:
                 movey=0
 
     # Just check what state the player is in - if he is not alive, then wait for a key press with game over on the screen
-    if player.alive == False:
+    if not player.alive:
         quitGame(enemy_list, player_list, goal_list)
         font = pygame.font.Font('freesansbold.ttf', 20)
         text = font.render("Game Over", 1, (10,10,10))
@@ -180,13 +194,15 @@ def runGame():
     if pygame.sprite.groupcollide(player_list, goal_list, False, False):
         print "you win" 
         score +=1
-        difficulty = difficulty + score * 70
+        difficulty = difficulty + score * 20
         quitGame(enemy_list, player_list, goal_list)
         setUpGame(difficulty)
     pygame.display.flip()
 
+
 def setUpGame(difficulty):
-    """This will set up the screen to begin the game - we need to get this out of the loop so we can have difficulty rounds"""
+    """This will set up the screen to begin the game - we need to get this out of the loop so we can have difficulty
+    rounds"""
     global enemy_list, score, DISPLAYSURF, BASICFONT, FPSCLOCK, player
     # Let's make the background green for now, and then draw everything afterwards. 
     DISPLAYSURF.fill(GREEN)
@@ -208,6 +224,7 @@ def setUpGame(difficulty):
         #all_sprite_list.add(o)
         pygame.display.flip()      
 
+
 def showGameOver():
     global score, difficulty
     font = pygame.font.Font('freesansbold.ttf', 50)
@@ -221,10 +238,12 @@ def showGameOver():
     difficulty = 1
     return
 
+
 def playerDies(enemies, player, goal):
+    """The player has died. """
     # At the moment, I think this function is not being called. 
     global score
-    print "player dies called"
+    # print "player dies called"
     quitGame(enemies, player, goal)
     font = pygame.font.Font('freesansbold.ttf', 20)
     text = font.render("Game Over", 1, (10,10,10))
@@ -235,9 +254,9 @@ def playerDies(enemies, player, goal):
     DISPLAYSURF.blit(text, textpos)
     pygame.time.wait(500)
     check = checkForKeyPress()
-    while check == True:
+    while check:
         check= checkForKeyPress()
-        pygame.event.get() # clear event queue
+        pygame.event.get()  # clear event queue
     return
 
 
@@ -247,12 +266,13 @@ def displayScore(score):
     #displayScoreRect.topleft = (WINWIDTH -10, WINHEIGHT-10)
     DISPLAYSURF.blit(displayScoreSurf, displayScoreRect)
 
+
 def quitGame(enemies, player, goal):
     # We are not ending the program, just the current game
     # We delete all the objects - cleaning up
-    enemies.empty() #  delete the enemies in the enemies list
+    enemies.empty()  # delete the enemies in the enemies list
     player.empty()  # delete the player in the player list
-    goal.empty() # delete the goal in the goal list
+    goal.empty()  # delete the goal in the goal list
     return 
 
 

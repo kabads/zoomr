@@ -25,8 +25,8 @@ class Goal(pygame.sprite.Sprite):
     def __init__(self):
         """Constructor"""
         pygame.sprite.Sprite.__init__(self)
-        x = random.randint(0,680-10)
-        y = random.randint(0,480-10)
+        x = random.randint(0,WINWIDTH-10)
+        y = random.randint(0,WINHEIGHT-10)
         self.image = pygame.image.load("yellow.jpg")
         self.rect = self.image.get_rect()
         self.rect.topleft = [x,y]
@@ -78,8 +78,8 @@ class Enemy(pygame.sprite.Sprite):
     """This is a static block that I will try to avoid"""
     def __init__(self):
         """Constructor"""
-        x = random.randint(0,680-10)
-        y = random.randint(0,480-10)
+        x = random.randint(0, WINWIDTH-10)
+        y = random.randint(0, WINHEIGHT-10)
         self.x = x
         self.y = y
         pygame.sprite.Sprite.__init__(self)
@@ -213,7 +213,7 @@ def setUpGame(difficulty):
     all_sprite_list.add(goal)
     
     # Here is the player - protagonist
-    player = Player(680/2, 480/2)
+    player = Player(WINWIDTH/2, WINHEIGHT/2)
     player_list.add(player)
     all_sprite_list.add(player)
 
